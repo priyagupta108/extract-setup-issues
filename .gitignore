@@ -1,0 +1,13 @@
+# macOS system file
+.DS_Store
+
+# Excel output files
+*.xlsx
+
+# Python bytecode
+__pycache__/
+*.pyc
+
+# Environment files
+.env
+.venv/
