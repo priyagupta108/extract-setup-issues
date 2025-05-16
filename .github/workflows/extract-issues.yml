@@ -1,42 +1,39 @@
-name: Extract Issues to Excel
+name: Extract GitHub Issues
 
 on:
+  workflow_dispatch:
   schedule:
-    - cron: '0 0 * * 1'  # Every Monday at midnight UTC
-  workflow_dispatch:      # Allow manual trigger
+    - cron: '0 1 * * *'  # Runs daily at 01:00 UTC; adjust as needed
 
 jobs:
-  extract_issues:
+  extract-issues:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
+      - name: Checkout repository
         uses: actions/checkout@v3
 
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: 3.9
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install requests openpyxl
+          python -m venv .venv
+          source .venv/bin/activate
+          pip install -r requirements.txt
 
-      - name: Extract GitHub Issues
+      - name: Run extract issues script
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
+          source .venv/bin/activate
           python scripts/extract_issues.py
 
-      - name: Commit Excel file
-        run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-          git add extracted_issues.xlsx
-          git commit -m "Update extracted issues Excel file"
-          git push
-
-
-
-
+      - name: Upload generated Excel files
+        uses: actions/upload-artifact@v4
+        with:
+          name: github-issues-excel
+          path: |
+            output/*.xlsx

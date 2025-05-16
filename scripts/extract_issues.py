@@ -11,6 +11,14 @@ TODAY_DATE = datetime.datetime.utcnow().isoformat() + "Z"
 PER_PAGE = 100
 
 TARGET_LABELS = {"OS: macOS", "OS: Ubuntu", "OS: Windows", "OS: Ubuntu24"}
+SPECIAL_LABELS = {
+    "OS: macOS": "G",
+    "OS: Ubuntu": "H",
+    "OS: Windows": "I",
+    "bug": "J",
+    "feature request": "K",
+    "announcement": "L"
+}
 
 headers = {
     "Authorization": f"token {TOKEN}",
@@ -33,7 +41,6 @@ def get_issues(state):
         data = response.json()
         if not data:
             break
-        # Filter issues created between 1 May and today, exclude PRs
         for issue in data:
             created_at = issue.get("created_at")
             if created_at and START_DATE <= created_at <= TODAY_DATE and "pull_request" not in issue:
@@ -43,10 +50,8 @@ def get_issues(state):
 
 def issues_to_excel_grouped(issues, filename="issues_grouped.xlsx"):
     wb = openpyxl.Workbook()
-    # Remove default sheet
     wb.remove(wb.active)
 
-    # Prepare groups
     grouped_issues = {label: [] for label in TARGET_LABELS}
     grouped_issues["Other"] = []
 
@@ -59,7 +64,6 @@ def issues_to_excel_grouped(issues, filename="issues_grouped.xlsx"):
         else:
             grouped_issues["Other"].append(issue)
 
-    # Write each group to its own sheet
     for label, issues_list in grouped_issues.items():
         ws = wb.create_sheet(title=label.replace(":", "").replace(" ", "_"))
         headers = ["Number", "Title", "State", "Created At", "Closed At", "Labels"]
@@ -73,17 +77,14 @@ def issues_to_excel_grouped(issues, filename="issues_grouped.xlsx"):
                 issue.get("closed_at", ""),
                 ", ".join([lbl["name"] for lbl in issue.get("labels", [])])
             ])
-
     wb.save(filename)
 
 def issues_to_excel_all(issues, filename="all_issues.xlsx"):
     wb = openpyxl.Workbook()
     ws = wb.active
     ws.title = "All Issues"
-
     headers = ["Number", "Title", "State", "Created At", "Closed At", "Labels"]
     ws.append(headers)
-
     for issue in issues:
         ws.append([
             issue["number"],
@@ -93,6 +94,32 @@ def issues_to_excel_all(issues, filename="all_issues.xlsx"):
             issue.get("closed_at", ""),
             ", ".join([lbl["name"] for lbl in issue.get("labels", [])])
         ])
+    wb.save(filename)
+
+def issues_to_excel_flagged(issues, filename="label_flags.xlsx"):
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Label Flags"
+
+    headers = ["Number", "Title", "State", "Created At", "Closed At", "Labels"]
+    label_columns = list(SPECIAL_LABELS.keys())
+    headers.extend(label_columns)
+    ws.append(headers)
+
+    for issue in issues:
+        labels = {lbl["name"].lower() for lbl in issue.get("labels", [])}
+        row = [
+            issue["number"],
+            issue["title"],
+            issue["state"],
+            issue["created_at"],
+            issue.get("closed_at", ""),
+            ", ".join(labels)
+        ]
+        # Add checkmarks for relevant labels
+        for label in label_columns:
+            row.append("✅" if label.lower() in labels else "")
+        ws.append(row)
 
     wb.save(filename)
 
@@ -101,8 +128,6 @@ if __name__ == "__main__":
     closed_issues = get_issues("closed")
     all_issues = open_issues + closed_issues
 
-    # Save grouped issues into one Excel workbook (multiple sheets)
     issues_to_excel_grouped(all_issues, filename="issues_grouped.xlsx")
-
-    # Save all issues (no grouping) into a separate Excel workbook
     issues_to_excel_all(all_issues, filename="all_issues.xlsx")
+    issues_to_excel_flagged(all_issues, filename="label_flags.xlsx")
