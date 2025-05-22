@@ -3,7 +3,7 @@ name: Extract GitHub Issues
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 1 * * *'  # Runs daily at 01:00 UTC; adjust as needed
+    - cron: '0 1 * * *'  
 
 jobs:
   extract-issues:
@@ -14,12 +14,13 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: 3.9
 
       - name: Install dependencies
         run: |
+          set -e
           python -m venv .venv
           source .venv/bin/activate
           pip install -r requirements.txt
@@ -28,6 +29,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
+          set -e
           source .venv/bin/activate
           python scripts/extract_issues.py
 
@@ -36,4 +38,6 @@ jobs:
         with:
           name: github-issues-excel
           path: |
-            output/*.xlsx
+            issues_grouped.xlsx
+            all_issues.xlsx
+            label_flags.xlsx
