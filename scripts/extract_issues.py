@@ -6,7 +6,10 @@ import time
 from openpyxl.styles import Font
 
 # Auth and repo info
-TOKEN = os.environ['GH_TOKEN']
+TOKEN = os.getenv("GH_TOKEN")
+if not TOKEN:
+    raise EnvironmentError("Missing GitHub token. Please set 'GH_TOKEN' in your environment or GitHub Actions secrets.")
+
 OWNER = "actions"
 REPO = "runner-images"
 
@@ -27,7 +30,7 @@ SPECIAL_LABELS = {
 }
 
 headers = {
-    "Authorization": f"token {TOKEN}",
+    "Authorization": f"Bearer {TOKEN}",
     "Accept": "application/vnd.github.v3+json"
 }
 
@@ -43,6 +46,8 @@ def get_issues(state):
             "page": page
         }
         response = requests.get(url, headers=headers, params=params, timeout=90)
+        if response.status_code == 401:
+            raise PermissionError("❌ Unauthorized. Check if your GH_TOKEN is valid and has correct permissions.")
         response.raise_for_status()
         data = response.json()
         if not data:

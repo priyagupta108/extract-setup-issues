@@ -10,22 +10,23 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: 🛎️ Checkout repository
         uses: actions/checkout@v3
 
-      - name: Set up Python
+      - name: 🐍 Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: 3.9
 
-      - name: Install dependencies
+      - name: 📦 Install dependencies
         run: |
           set -e
           python -m venv .venv
           source .venv/bin/activate
+          pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run extract issues script
+      - name: 📝 Run extract issues script
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
@@ -33,7 +34,7 @@ jobs:
           source .venv/bin/activate
           python scripts/extract_issues.py
 
-      - name: Upload generated Excel file
+      - name: 📤 Upload generated Excel file
         uses: actions/upload-artifact@v4
         with:
           name: github-issues-label-flags
