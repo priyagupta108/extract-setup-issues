@@ -1,4 +1,4 @@
-name: Download Azure Cosmos DB Emulator and Show Checksum
+name: Download WSI and Show Checksum
 
 on:
   workflow_dispatch:
@@ -8,8 +8,8 @@ jobs:
     runs-on: windows-latest
 
     env:
-      COSMOSDB_URL: "https://aka.ms/cosmosdb-emulator"
-      COSMOSDB_FILE: "cosmosdb-emulator.msi"
+      COSMOSDB_URL: "https://github.com/microsoft/WSL/releases/download/2.5.7/wsl.2.5.7.0.x64.msi"
+      COSMOSDB_FILE: "wsi.msi"
 
     steps:
       - name: Download Cosmos DB Emulator
