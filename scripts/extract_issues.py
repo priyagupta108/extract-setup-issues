@@ -131,4 +131,4 @@ if __name__ == "__main__":
 
     end_time = time.time()
     elapsed_seconds = end_time - start_time
-    print(f"\n✅ Script completed in {elapsed_seconds:.2f} seconds.")
+    print(f"\n✅ Script completed in {elapsed_seconds:.2f} seconds.") 
