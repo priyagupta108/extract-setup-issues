@@ -5,6 +5,15 @@ import openpyxl
 import time
 from openpyxl.styles import Font
 
+# -----------------------------------------------------------------------------
+# Script Description:
+# This script fetches GitHub issues for the repository 'actions/runner-images'
+# using the REST API endpoint:
+#   GET /repos/actions/runner-images/issues?state={open|closed}&since={START_DATE}&per_page=100&page={n}
+# It collects issues created or updated in the last 7 months, flags special labels,
+# and exports the results to an Excel file.
+# -----------------------------------------------------------------------------
+
 # Auth and repo info
 TOKEN = os.getenv("GH_TOKEN")
 if not TOKEN:
