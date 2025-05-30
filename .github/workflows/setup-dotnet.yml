@@ -1,4 +1,4 @@
-name: Java Issues Report 
+name: Dotnet Issues Report 
 
 on:
   # push:
@@ -33,10 +33,10 @@ jobs:
         run: |
           set -e
           source .venv/bin/activate
-          python scripts/extract_issues_java.py
+          python scripts/extract_issues_dotnet.py
         
       - name: 📤 Upload generated Excel file
         uses: actions/upload-artifact@v4
         with:
-          name: java-issues-label-flags
-          path: issues_setup_java.xlsx
+          name: dotnet-issues-label-flags
+          path: issues_setup_dotnet.xlsx
