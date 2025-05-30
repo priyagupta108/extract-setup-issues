@@ -11,7 +11,7 @@ from openpyxl.styles import Font
 # using the REST API endpoint:
 #   GET /repos/actions/setup-dotnet/issues?state={open|closed}&since={START_DATE}&per_page=100&page={n}
 # It collects issues created or updated in the last 4 months and exports them to an Excel file.
-# -----------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 
 # Auth and repo info
 TOKEN = os.getenv("GH_TOKEN")
