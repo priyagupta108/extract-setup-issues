@@ -1,4 +1,4 @@
-name: Python Issues Report 
+name: Go Issues Report 
 
 on:
   # push:
@@ -33,10 +33,10 @@ jobs:
         run: |
           set -e
           source .venv/bin/activate
-          python scripts/extract_issues_python.py
+          python scripts/extract_issues_go.py
         
       - name: 📤 Upload generated Excel file
         uses: actions/upload-artifact@v4
         with:
-          name: python-issues-label-flags
-          path: issues_setup_python.xlsx
+          name: go-issues-label-flags
+          path: issues_setup_go.xlsx
