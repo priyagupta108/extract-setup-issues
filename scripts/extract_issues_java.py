@@ -3,14 +3,13 @@ import requests
 import datetime
 import openpyxl
 import time
-import re
 from openpyxl.styles import Font
 
 # -----------------------------------------------------------------------------
 # Script Description:
-# This script fetches GitHub issues for the repository 'actions/setup-node'
+# This script fetches GitHub issues for the repository 'actions/setup-java'
 # using the REST API endpoint:
-#   GET /repos/actions/setup-node/issues?state={open|closed}&since={START_DATE}&per_page=100&page={n}
+#   GET /repos/actions/setup-java/issues?state={open|closed}&since={START_DATE}&per_page=100&page={n}
 # It collects issues created or updated in the last 4 months and exports them to an Excel file.
 # -----------------------------------------------------------------------------
 
@@ -20,7 +19,7 @@ if not TOKEN:
     raise EnvironmentError("Missing GitHub token. Please set 'GH_TOKEN' in your environment or GitHub Actions secrets.")
 
 OWNER = "actions"
-REPO = "setup-node"
+REPO = "setup-java"
 
 # Define the starting date (January 2019)
 start_year = 2019
@@ -70,16 +69,7 @@ def get_issues(state):
         page += 1
     return issues
 
-def sanitize_string(value):
-    """
-    Remove illegal characters from a string to make it safe for Excel.
-    """
-    if not isinstance(value, str):
-        return value
-    # Remove ASCII control characters (0-31) except for tab, newline, and carriage return
-    return re.sub(r"[\x00-\x08\x0B-\x1F]", "", value)
-
-def issues_to_excel(issues, filename="issues_setup_node.xlsx"):
+def issues_to_excel(issues, filename="issues_setup_java.xlsx"):
     wb = openpyxl.Workbook()
     ws = wb.active
     ws.title = "Issues"
@@ -108,17 +98,16 @@ def issues_to_excel(issues, filename="issues_setup_node.xlsx"):
         issue_number = issue["number"]
         issue_url = f"https://github.com/{OWNER}/{REPO}/issues/{issue_number}"
 
-        # Sanitize all string values in the row
         row = [
             issue_number,
-            sanitize_string(issue["title"]),
-            sanitize_string(issue["state"]),
-            sanitize_string(created_at),
-            sanitize_string(created_month),
-            sanitize_string(closed_at),
-            sanitize_string(closed_month),
+            issue["title"],
+            issue["state"],
+            created_at,
+            created_month,
+            closed_at,
+            closed_month,
             days_taken,
-            sanitize_string(", ".join(labels))
+            ", ".join(labels)
         ]
 
         ws.append(row)
@@ -137,7 +126,7 @@ if __name__ == "__main__":
     closed_issues = get_issues("closed")
     all_issues = open_issues + closed_issues
 
-    issues_to_excel(all_issues, filename="issues_setup_node.xlsx")
+    issues_to_excel(all_issues, filename="issues_setup_java.xlsx")
 
     end_time = time.time()
     elapsed_seconds = end_time - start_time
