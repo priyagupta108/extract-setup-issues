@@ -1,41 +1,42 @@
-name: Extract GitHub Issues
+name: Python Issues Report 
 
 on:
+  # push:
+  #   branches:
+  #     - setup-actions
+
   workflow_dispatch:
-  schedule:
-    - cron: '0 1 * * *'  
 
 jobs:
-  extract-issues:
+  generate-issue-report:
     runs-on: ubuntu-latest
 
     steps:
-      - name: 🛎️ Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: 🐍 Set up Python
-        uses: actions/setup-python@v5
+      - name: Set up Python
+        uses: actions/setup-python@v4
         with:
-          python-version: 3.9
+          python-version: '3.10'
 
       - name: 📦 Install dependencies
         run: |
           set -e
           python -m venv .venv
           source .venv/bin/activate
-          pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install openpyxl requests 
 
-      - name: 📝 Run extract issues script
+      - name: Run issue report script
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -e
           source .venv/bin/activate
-          python scripts/extract_issues.py
-
+          python scripts/extract_issues_python.py
+        
       - name: 📤 Upload generated Excel file
         uses: actions/upload-artifact@v4
         with:
           name: github-issues-label-flags
-          path: label_flags.xlsx
+          path: issues_setup_python.xlsx
