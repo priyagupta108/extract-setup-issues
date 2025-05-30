@@ -35,7 +35,7 @@ months = (current_year - start_year) * 12 + (current_month - start_month)
 
 # Calculate date 5 months ago
 TODAY_DATE = datetime.datetime.utcnow()
-START_DATE = (TODAY_DATE - datetime.timedelta(days=30 * months)).isoformat() + "Z"
+START_DATE = (TODAY_DATE - datetime.timedelta(days=30 * months + 1)).isoformat() + "Z"
 TODAY_DATE = TODAY_DATE.isoformat() + "Z"
 PER_PAGE = 100
 
